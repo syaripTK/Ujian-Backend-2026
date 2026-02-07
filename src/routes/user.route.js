@@ -1,13 +1,28 @@
 const express = require("express");
-const { register, login } = require("../modules/user/user.controller.js");
+const verifyToken = require("../shared/middlewares/auth.middleware.js");
 const {
-  registerValidator,
-  loginValidator,
-} = require("../modules/user/user.validator.js");
+  createUser,
+  seeAllUser,
+  removeUser,
+} = require("../modules/user/user.controller.js");
+const { createValidator } = require("../modules/user/user.validator.js");
+const upload = require("../shared/middlewares/upload.middleware.js");
 const validate = require("../shared/middlewares/validate.js");
 const router = express.Router();
 
-router.post("/register", registerValidator, validate, register);
-router.post("/login", loginValidator, validate, login);
+router.post(
+  "/create",
+  verifyToken(["admin"]),
+  upload.single("profil"),
+  createValidator,
+  validate,
+  createUser,
+);
+router.get(
+  "/lookup",
+  verifyToken(["admin", "kabagppa", "kabagumum"]),
+  seeAllUser,
+);
+router.delete("/remove/:id", verifyToken(["admin"]), removeUser);
 
 module.exports = router;

@@ -1,7 +1,22 @@
-const { User } = require("../../db/models/index.js");
+const { User, Cuti } = require("../../db/models/index.js");
 
 const create = async (body) => {
   return await User.create(body);
+};
+
+const findAll = async () => {
+  return await User.findAll({
+    attributes: {
+      exclude: ["password", "profil", "createdAt", "updatedAt"],
+    },
+    include: [
+      {
+        model: Cuti,
+        as: "cuti",
+        attributes: ["id", "alasan", "status"],
+      },
+    ],
+  });
 };
 
 const findId = async (id) => {
@@ -12,10 +27,6 @@ const findUsn = async (username) => {
   return await User.findOne({
     where: { username },
   });
-};
-
-const look = async () => {
-  return await User.findAll();
 };
 
 const update = async (id, body) => {
@@ -34,8 +45,7 @@ module.exports = {
   create,
   findId,
   findUsn,
-  look,
   update,
   drop,
+  findAll,
 };
-

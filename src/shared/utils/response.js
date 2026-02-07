@@ -15,7 +15,7 @@ const successResponse = (res, code, message, data) => {
 
 const loginResponse = (res, code, message, token, user) => {
   return res.status(code).json({
-    status: "error",
+    status: "success",
     message,
     token,
     user,
