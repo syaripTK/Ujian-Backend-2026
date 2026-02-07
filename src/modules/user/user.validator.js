@@ -102,20 +102,19 @@ const createValidator = [
     .withMessage("Role tidak valid"),
 ];
 
-const updateValidator = [
+const idParamsValidator = [
   param("id")
-    .trim()
+    .toInt()
     .notEmpty()
     .withMessage("Id param wajib diisi")
     .bail()
-    .isNumeric()
-    .withMessage("Id param harus berupa angka"),
-
-    
+    .isInt({ min: 1 })
+    .withMessage("Id param harus berupa angka positif"),
 ];
 
 module.exports = {
   registerValidator,
   loginValidator,
   createValidator,
+  idParamsValidator
 };

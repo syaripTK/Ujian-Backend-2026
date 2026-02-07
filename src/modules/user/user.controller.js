@@ -95,6 +95,12 @@ const removeUser = async (req, res) => {
     if (!user) {
       return errorResponse(res, 404, "Maaf, data user tidak ditemukan");
     }
+    if (user.profil) {
+      const filePath = path.join(__dirname, "../uploads", user.profil);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
     await drop(id);
     return successResponse(res, 200, "Data user berhasil dihapus");
   } catch (error) {
@@ -146,5 +152,5 @@ module.exports = {
   seeAllUser,
   removeUser,
   updateUser,
-  changePassword
+  changePassword,
 };

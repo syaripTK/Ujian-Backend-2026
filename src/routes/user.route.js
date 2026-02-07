@@ -5,7 +5,10 @@ const {
   seeAllUser,
   removeUser,
 } = require("../modules/user/user.controller.js");
-const { createValidator } = require("../modules/user/user.validator.js");
+const {
+  createValidator,
+  idParamsValidator,
+} = require("../modules/user/user.validator.js");
 const upload = require("../shared/middlewares/upload.middleware.js");
 const validate = require("../shared/middlewares/validate.js");
 const router = express.Router();
@@ -23,6 +26,12 @@ router.get(
   verifyToken(["admin", "kabagppa", "kabagumum"]),
   seeAllUser,
 );
-router.delete("/remove/:id", verifyToken(["admin"]), removeUser);
+router.delete(
+  "/remove/:id",
+  verifyToken(["admin"]),
+  idParamsValidator,
+  validate,
+  removeUser,
+);
 
 module.exports = router;
