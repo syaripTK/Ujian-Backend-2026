@@ -112,9 +112,25 @@ const changeValidator = [
     }),
 ];
 
+changeUsnValidator = [
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("Username wajib diisi")
+    .bail()
+    .custom(async (username) => {
+      const user = await User.findOne({ where: { username } });
+      if (user != null) {
+        throw new Error("Username sudah ada, silahkan isi yang lain");
+      }
+      return true;
+    }),
+];
+
 module.exports = {
   registerValidator,
   loginValidator,
   idParamsValidator,
   changeValidator,
+  changeUsnValidator
 };

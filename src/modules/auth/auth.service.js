@@ -1,4 +1,4 @@
-const { User, Cuti } = require("../../db/models/index.js");
+const { User, Cuti, Karyawan } = require("../../db/models/index.js");
 
 const create = async (body) => {
   return await User.create(body);
@@ -35,6 +35,14 @@ const update = async (id, body) => {
   return user;
 };
 
+const updateKaryawan = async (username, body) => {
+  const user = await Karyawan.findOne({
+    where: { username },
+  });
+  await user.update(body);
+  return user;
+};
+
 const drop = async (id) => {
   return await User.destroy({
     where: { id },
@@ -48,4 +56,6 @@ module.exports = {
   update,
   drop,
   findAll,
+  update,
+  updateKaryawan,
 };

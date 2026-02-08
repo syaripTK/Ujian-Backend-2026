@@ -8,11 +8,14 @@ const {
   findId,
   findUsn,
   update,
-
+  updateKaryawan,
 } = require("./auth.service.js");
-const { generateToken, hashPassword, comparePassword } = require("../../shared/utils/helpers.js");
+const {
+  generateToken,
+  hashPassword,
+  comparePassword,
+} = require("../../shared/utils/helpers.js");
 const jwt = require("jsonwebtoken");
-
 
 const register = async (req, res) => {
   try {
@@ -67,8 +70,21 @@ const changePassword = async (req, res) => {
   }
 };
 
+const changeUsername = async (req, res) => {
+  try {
+    const { username } = req.body;
+    const user = await findId(req.user.id);
+    await update(req.user.id, { username });
+    await updateKaryawan(user.username, { username });
+    return successResponse(res, 200, "Username berhasil diupdate");
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   register,
   login,
   changePassword,
+  changeUsername,
 };
