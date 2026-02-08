@@ -4,6 +4,7 @@ const sequelize = require("./config/sequelize.js");
 const path = require("path");
 const authRoute = require("./routes/auth.route.js");
 const userRoute = require("./routes/user.route.js");
+const karyawanRoute = require("./routes/karyawan.route.js");
 
 const app = express();
 app.use(express.json());
@@ -12,5 +13,5 @@ app.use("/api", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoute);
 app.use("/api/masterdata/user", userRoute);
-
+app.use("/api/masterdata/karyawan", karyawanRoute);
 module.exports = app;

@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const { User, Cuti } = require("../../db/models/index.js");
 
 const create = async (body) => {
@@ -24,32 +23,9 @@ const findId = async (id) => {
   return await User.findByPk(id);
 };
 
-const search = async (id) => {
-  return await User.findByPk(id, {
-    attributes: {
-      exclude: ["password", "profil", "createdAt", "updatedAt"],
-    },
-    include: [
-      {
-        model: Cuti,
-        as: "cuti",
-        attributes: ["id", "alasan", "status"],
-      },
-    ],
-  });
-};
-
 const findUsn = async (username) => {
   return await User.findOne({
     where: { username },
-  });
-};
-
-const findByName = async (keyword) => {
-  return await User.findAll({
-    where: {
-      username: { [Op.like]: `%${keyword}%` },
-    },
   });
 };
 
@@ -72,6 +48,4 @@ module.exports = {
   update,
   drop,
   findAll,
-  search,
-  findByName,
 };

@@ -1,62 +1,23 @@
 const {
   errorResponse,
   successResponse,
-  loginResponse,
 } = require("../../shared/utils/response.js");
 const {
   create,
   findId,
-  findUsn,
   update,
   drop,
   findAll,
+  search,
+  findByName,
 } = require("./user.service.js");
-const { generateToken, hashPassword, comparePassword } = require("./auth.js");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
-
-const register = async (req, res) => {
-  try {
-    if (!req.body) {
-      return errorResponse(res, 400, "Body wajib diisi");
-    }
-    const { nama, username, email, password } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
-    const body = { nama, username, email, password: hashed };
-    await create(body);
-    return successResponse(res, 201, "User berhasil dibuat");
-  } catch (error) {
-    return errorResponse(res, 500, error.message);
-  }
-};
-
-const login = async (req, res) => {
-  try {
-    if (!req.body) {
-      return errorResponse(res, 400, "Body wajib diisi");
-    }
-    const { username, password } = req.body;
-    const user = await findUsn(username);
-    if (!user) {
-      return errorResponse(res, 404, "Maaf username tidak ditemukan");
-    }
-    const isMatch = await comparePassword(password, user.password);
-    if (!isMatch) {
-      return errorResponse(res, 401, "Maaf, password salah");
-    }
-    const token = generateToken(user);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return loginResponse(res, 200, "Login berhasil", token, {
-      id: decoded.id,
-      username: decoded.username,
-      role: decoded.role,
-    });
-  } catch (error) {
-    return errorResponse(res, 500, error.message);
-  }
-};
+const {
+  hashPassword,
+  comparePassword,
+  generateToken,
+} = require("../../shared/utils/helpers.js");
 
 const createUser = async (req, res) => {
   try {
@@ -96,7 +57,7 @@ const removeUser = async (req, res) => {
       return errorResponse(res, 404, "Maaf, data user tidak ditemukan");
     }
     if (user.profil) {
-      const filePath = path.join(__dirname, "../uploads", user.profil);
+      const filePath = path.join(__dirname, "../../uploads", user.profil);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
@@ -117,40 +78,61 @@ const updateUser = async (req, res) => {
     }
     let profil = user.profil;
     if (req.file) {
-      const filePath = path.join(__dirname, "../uploads", user.profil);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      if (user.profil) {
+        const filePath = path.join(__dirname, "../../uploads", user.profil);
+
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
+
       profil = path.basename(req.file.path);
     }
-    const { nama, username, email, password, role } = req.body;
-    const body = { nama, username, email, password, role, profil };
-    await update(body);
+    const { nama, role, email } = req.body;
+    const body = { nama, email, role, profil };
+    await update(id, body);
     return successResponse(res, 200, "Data user berhasil diupdate");
   } catch (error) {
     return errorResponse(res, 500, error.message);
   }
 };
 
-const changePassword = async (req, res) => {
+const searchUser = async (req, res) => {
   try {
-    const user = await findId(req.user.id);
-    const { password_lama, password_baru } = req.body;
-    const hashed = await hashPassword(password_baru);
-    const body = { password: hashed };
-    await update(req.user.id, body);
-    return successResponse(res, 200, "Password berhasil diubah");
+    const { id } = req.params;
+    const found = await search(id);
+    if (!found) {
+      return errorResponse(res, 404, "Data user tidak ditemukan");
+    }
+    return successResponse(res, 200, "Data user berhasil ditemukan", found);
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
+const searchName = async (req, res) => {
+  try {
+    const { nama } = req.query;
+    const users = await findByName(nama);
+
+    if (!users || users.length === 0) {
+      return errorResponse(
+        res,
+        404,
+        `Oopss.. user dengan username ${nama} tidak ditemukan`,
+      );
+    }
+    return successResponse(res, 200, "Data user berhasil ditemukan", users);
   } catch (error) {
     return errorResponse(res, 500, error.message);
   }
 };
 
 module.exports = {
-  register,
-  login,
   createUser,
   seeAllUser,
   removeUser,
   updateUser,
-  changePassword,
+  searchUser,
+  searchName,
 };

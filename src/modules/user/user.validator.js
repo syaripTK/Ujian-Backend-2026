@@ -1,62 +1,5 @@
-const { body, param } = require("express-validator");
+const { body, param, query } = require("express-validator");
 const { User } = require("../../db/models/index.js");
-
-const registerValidator = [
-  body("nama").trim().notEmpty().withMessage("Nama wajib diisi"),
-
-  body("username")
-    .trim()
-    .notEmpty()
-    .withMessage("Username wajib diisi")
-    .bail()
-    .custom(async (username) => {
-      const user = await User.findOne({ where: { username } });
-      if (user != null) {
-        throw new Error("Username sudah ada, silahkan isi yang lain");
-      }
-      return true;
-    }),
-
-  body("email")
-    .trim()
-    .notEmpty()
-    .withMessage("Email wajib diisi")
-    .bail()
-    .isEmail()
-    .withMessage("Format email tidak valid")
-    .custom(async (email) => {
-      const user = await User.findOne({ where: { email } });
-      if (user) {
-        throw new Error("Email sudah terdaftar");
-      }
-      return true;
-    }),
-
-  body("password")
-    .trim()
-    .notEmpty()
-    .withMessage("Password wajib diisi")
-    .bail()
-    .isLength({ min: 6 })
-    .withMessage("Password minimal 6 karakter"),
-
-  body("konfirmasi-password")
-    .trim()
-    .notEmpty()
-    .withMessage("Konfirmasi password wajib diisi")
-    .bail()
-    .custom((val, { req }) => {
-      if (val !== req.body.password) {
-        throw new Error("Konfirmasi password tidak sama dengan password");
-      }
-      return true;
-    }),
-];
-
-const loginValidator = [
-  body("username").trim().notEmpty().withMessage("Username wajib diisi"),
-  body("password").trim().notEmpty().withMessage("Password wajib diisi"),
-];
 
 const createValidator = [
   body("nama").trim().notEmpty().withMessage("Nama wajib diisi"),
@@ -103,18 +46,54 @@ const createValidator = [
 ];
 
 const idParamsValidator = [
-  param("id")
-    .toInt()
+  param("id").toInt().isInt({ min: 1 }).withMessage("Id params tidak valid"),
+];
+
+const updateUserValidator = [
+  param("id").toInt().isInt({ min: 1 }).withMessage("Id params tidak valid"),
+
+  body("nama")
+    .trim()
     .notEmpty()
-    .withMessage("Id param wajib diisi")
+    .withMessage("Nama wajib diisi")
     .bail()
-    .isInt({ min: 1 })
-    .withMessage("Id param harus berupa angka positif"),
+    .isLength({ max: 50 })
+    .withMessage("Nama maksimal 50 karakter")
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage("Nama minimal 6 karakter"),
+
+  body("email")
+    .optional()
+    .isEmail()
+    .withMessage("Format email tidak valid")
+    .custom(async (email) => {
+      const user = await User.findOne({ where: { email } });
+      if (user) {
+        throw new Error("Email sudah terdaftar");
+      }
+      return true;
+    }),
+
+  body("role")
+    .optional()
+    .isIn(["admin", "user", "kabagppa", "kabagumum"])
+    .withMessage("Role tidak valid"),
+];
+
+const queryValidator = [
+  query("nama")
+    .trim()
+    .notEmpty()
+    .withMessage("Query tidak boleh kosong")
+    .bail()
+    .matches(/^[a-zA-Z0-9\s]+$/)
+    .withMessage("Format query tidak valid"),
 ];
 
 module.exports = {
-  registerValidator,
-  loginValidator,
   createValidator,
-  idParamsValidator
+  idParamsValidator,
+  updateUserValidator,
+  queryValidator,
 };
