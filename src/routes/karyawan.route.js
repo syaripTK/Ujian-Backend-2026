@@ -4,11 +4,14 @@ const {
   createKaryawan,
   spillKaryawan,
   karyawanResign,
+  searchName,
+  searchId,
 } = require("../modules/karyawan/karyawan.controller");
 const {
   createKaryawanValidator,
   idParamsValidator,
   upgradeValidator,
+  queryValidator,
 } = require("../modules/karyawan/karyawan.validator");
 const validate = require("../shared/middlewares/validate");
 const verifyToken = require("../shared/middlewares/auth.middleware");
@@ -37,4 +40,19 @@ router.patch(
   validate,
   upgradeKaryawan,
 );
+router.get(
+  "/search",
+  verifyToken(["admin"]),
+  queryValidator,
+  validate,
+  searchName,
+);
+router.get(
+  "/find/:id",
+  verifyToken(["admin"]),
+  idParamsValidator,
+  validate,
+  searchId,
+);
+
 module.exports = router;

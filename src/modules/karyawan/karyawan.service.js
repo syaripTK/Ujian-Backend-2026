@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Karyawan } = require("../../db/models/index.js");
 
 const create = async (body) => {
@@ -6,6 +7,14 @@ const create = async (body) => {
 
 const findId = async (id) => {
   return await Karyawan.findByPk(id);
+};
+
+const findByName = async (keyword) => {
+  return await Karyawan.findAll({
+    where: {
+      username: { [Op.like]: `%${keyword}%` },
+    },
+  });
 };
 
 const getAll = async () => {
@@ -26,4 +35,6 @@ const update = async (id, body) => {
 
 
 
-module.exports = { create, findId, getAll, remove, update };
+
+
+module.exports = { create, findId, getAll, remove, update, findByName };

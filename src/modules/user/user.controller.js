@@ -15,8 +15,6 @@ const path = require("path");
 const fs = require("fs");
 const {
   hashPassword,
-  comparePassword,
-  generateToken,
 } = require("../../shared/utils/helpers.js");
 
 const createUser = async (req, res) => {

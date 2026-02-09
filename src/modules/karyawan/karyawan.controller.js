@@ -9,6 +9,7 @@ const {
   getAll,
   remove,
   update,
+  findByName,
 } = require("./karyawan.service.js");
 
 const createKaryawan = async (req, res) => {
@@ -65,9 +66,46 @@ const upgradeKaryawan = async (req, res) => {
   }
 };
 
+const searchName = async (req, res) => {
+  try {
+    const { nama } = req.query;
+    const users = await findByName(nama);
+
+    if (!users || users.length === 0) {
+      return errorResponse(
+        res,
+        404,
+        `Oopss.. karyawan dengan username ${nama} tidak ditemukan`,
+      );
+    }
+    return successResponse(res, 200, "Data karyawan berhasil ditemukan", users);
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
+const searchId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const found = await findId(id);
+    if (!found) {
+      return errorResponse(
+        res,
+        404,
+        `Oopss.. karyawan dengan id (${id}) tidak ditemukan`,
+      );
+    }
+    return successResponse(res, 200, "Data karyawan berhasil ditemukan", found);
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   createKaryawan,
   spillKaryawan,
   karyawanResign,
   upgradeKaryawan,
+  searchName,
+  searchId
 };
