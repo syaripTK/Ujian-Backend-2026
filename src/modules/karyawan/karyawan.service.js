@@ -17,6 +17,12 @@ const findByName = async (keyword) => {
   });
 };
 
+const findByUsn = async (username) => {
+  return await Karyawan.findOne({
+    where: { username },
+  });
+};
+
 const getAll = async () => {
   return await Karyawan.findAll();
 };
@@ -33,8 +39,12 @@ const update = async (id, body) => {
   return user;
 };
 
-
-
-
-
-module.exports = { create, findId, getAll, remove, update, findByName };
+module.exports = {
+  create,
+  findId,
+  getAll,
+  remove,
+  update,
+  findByName,
+  findByUsn,
+};

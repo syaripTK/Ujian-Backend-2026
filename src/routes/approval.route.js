@@ -1,5 +1,5 @@
 const express = require("express");
-const validate = require("../shared/middlewares/validate.js");
+const validate = require("../shared/middlewares/errors/validate.js");
 const verifyToken = require("../shared/middlewares/auth.middleware.js");
 const {
   cutiApprovement,

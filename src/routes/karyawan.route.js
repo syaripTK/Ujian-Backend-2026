@@ -6,6 +6,7 @@ const {
   karyawanResign,
   searchName,
   searchId,
+  getProfile,
 } = require("../modules/karyawan/karyawan.controller");
 const {
   createKaryawanValidator,
@@ -13,7 +14,7 @@ const {
   upgradeValidator,
   queryValidator,
 } = require("../modules/karyawan/karyawan.validator");
-const validate = require("../shared/middlewares/validate");
+const validate = require("../shared/middlewares/errors/validate");
 const verifyToken = require("../shared/middlewares/auth.middleware");
 
 const router = express.Router();
@@ -53,6 +54,11 @@ router.get(
   idParamsValidator,
   validate,
   searchId,
+);
+router.get(
+  "/profil",
+  verifyToken(["admin", "kabagppa", "kabagumum", "user"]),
+  getProfile,
 );
 
 module.exports = router;

@@ -3,19 +3,26 @@ const {
   addCuti,
   updateCuti,
   removeCuti,
+  sisaCuti,
 } = require("../modules/cuti/cuti.controller");
 const {
   cutiValidator,
   idParamsValidator,
 } = require("../modules/cuti/cuti.validator");
-const validate = require("../shared/middlewares/validate.js");
+const validate = require("../shared/middlewares/errors/validate.js");
 const verifyToken = require("../shared/middlewares/auth.middleware.js");
 
 const router = express.Router();
-router.post("/create", verifyToken(["user"]), cutiValidator, validate, addCuti);
+router.post(
+  "/create",
+  verifyToken(["user", "admin"]),
+  cutiValidator,
+  validate,
+  addCuti,
+);
 router.patch(
   "/update/:id",
-  verifyToken(["user"]),
+  verifyToken(["user", "admin"]),
   idParamsValidator,
   cutiValidator,
   validate,
@@ -23,9 +30,10 @@ router.patch(
 );
 router.delete(
   "/delete/:id",
-  verifyToken(["user"]),
+  verifyToken(["user", "admin"]),
   idParamsValidator,
   validate,
   removeCuti,
 );
+router.get("/sisa-cuti", verifyToken(["user", "admin"]), sisaCuti);
 module.exports = router;

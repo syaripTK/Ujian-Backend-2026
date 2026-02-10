@@ -11,7 +11,7 @@ const {
   changeValidator,
   changeUsnValidator,
 } = require("../modules/auth/auth.validator.js");
-const validate = require("../shared/middlewares/validate.js");
+const validate = require("../shared/middlewares/errors/validate.js");
 const verifyToken = require("../shared/middlewares/auth.middleware.js");
 const router = express.Router();
 

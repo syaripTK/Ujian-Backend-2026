@@ -17,6 +17,13 @@ const findByName = async (keyword) => {
   });
 };
 
+const findByUserId = async (userId) => {
+  return await Cuti.findAll({
+    where: { userId },
+    raw: true,
+  });
+};
+
 const update = async (id, body) => {
   const data = await findId(id);
   await data.update(body);
@@ -35,4 +42,5 @@ module.exports = {
   update,
   drop,
   findByName,
+  findByUserId
 };

@@ -10,6 +10,7 @@ const {
   remove,
   update,
   findByName,
+  findByUsn,
 } = require("./karyawan.service.js");
 
 const createKaryawan = async (req, res) => {
@@ -101,11 +102,25 @@ const searchId = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  try {
+    if (req.user.role == "user") {
+      const data = await findByUsn(req.user.username);
+      return res.status(200).json({ status: "success", data });
+    }
+    const karyawan = await getAll();
+    return res.status(200).json({ status: "success", data: karyawan });
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   createKaryawan,
   spillKaryawan,
   karyawanResign,
   upgradeKaryawan,
   searchName,
-  searchId
+  searchId,
+  getProfile,
 };

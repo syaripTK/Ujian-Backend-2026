@@ -13,9 +13,7 @@ const {
 } = require("./user.service.js");
 const path = require("path");
 const fs = require("fs");
-const {
-  hashPassword,
-} = require("../../shared/utils/helpers.js");
+const { hashPassword } = require("../../shared/utils/helpers.js");
 
 const createUser = async (req, res) => {
   try {
@@ -86,8 +84,9 @@ const updateUser = async (req, res) => {
 
       profil = path.basename(req.file.path);
     }
-    const { nama, role, email } = req.body;
-    const body = { nama, email, role, profil };
+    const { nama, username, password, role, email } = req.body;
+    const hashed = await hashPassword(password);
+    const body = { nama, username, email, password: hashed, role, profil };
     await update(id, body);
     return successResponse(res, 200, "Data user berhasil diupdate");
   } catch (error) {

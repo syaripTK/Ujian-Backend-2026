@@ -54,14 +54,23 @@ const updateUserValidator = [
 
   body("nama")
     .trim()
-    .notEmpty()
-    .withMessage("Nama wajib diisi")
-    .bail()
+    .optional()
     .isLength({ max: 50 })
     .withMessage("Nama maksimal 50 karakter")
     .bail()
     .isLength({ min: 6 })
     .withMessage("Nama minimal 6 karakter"),
+
+  body("username")
+    .trim()
+    .optional()
+    .custom(async (username) => {
+      const user = await User.findOne({ where: { username } });
+      if (user != null) {
+        throw new Error("Username sudah ada, silahkan isi yang lain");
+      }
+      return true;
+    }),
 
   body("email")
     .optional()
@@ -75,8 +84,25 @@ const updateUserValidator = [
       return true;
     }),
 
-  body("role")
+  body("password")
+    .trim()
     .optional()
+    .isLength({ min: 6 })
+    .withMessage("Password minimal 6 karakter"),
+
+  body("konfirmasi-password")
+    .trim()
+    .optional()
+    .custom((val, { req }) => {
+      if (val !== req.body.password) {
+        throw new Error("Konfirmasi password tidak sama dengan password");
+      }
+      return true;
+    }),
+
+  body("role")
+    .notEmpty()
+    .withMessage("Role wajib diisi")
     .isIn(["admin", "user", "kabagppa", "kabagumum"])
     .withMessage("Role tidak valid"),
 ];

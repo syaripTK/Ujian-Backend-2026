@@ -14,7 +14,7 @@ const {
   updateUserValidator,
   queryValidator,
 } = require("../modules/user/user.validator.js");
-const validate = require("../shared/middlewares/validate.js");
+const validate = require("../shared/middlewares/errors/validate.js");
 const uploadPhoto = require("../shared/middlewares/upload.middlware.js");
 const router = express.Router();
 

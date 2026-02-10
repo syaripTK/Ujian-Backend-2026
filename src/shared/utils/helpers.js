@@ -20,8 +20,19 @@ const comparePassword = async (input, hashed) => {
   return await bcrypt.compare(input, hashed);
 };
 
+const hitungHariCuti = (mulai, selesai) => {
+  const start = new Date(mulai);
+  const end = new Date(selesai);
+
+  const diffTime = end - start;
+  const diffDay = diffTime / (1000 * 60 * 60 * 24);
+
+  return diffDay + 1;
+};
+
 module.exports = {
   generateToken,
   hashPassword,
   comparePassword,
+  hitungHariCuti,
 };
