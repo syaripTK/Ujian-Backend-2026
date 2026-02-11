@@ -27,15 +27,17 @@ const update = async (id, body) => {
   return data;
 };
 
-const updateCuti = async (id, body) => {
+const updateCuti = async (id, body, transaction) => {
   return await Cuti.update(body, {
     where: { id },
+    transaction,
   });
 };
 
-const updateApproval = async (id, body) => {
+const updateApproval = async (id, body, transaction) => {
   return await Approval.update(body, {
     where: { id },
+    transaction,
   });
 };
 
@@ -60,5 +62,5 @@ module.exports = {
   findByName,
   updateCuti,
   findApprovalByCutiId,
-  updateApproval
+  updateApproval,
 };

@@ -4,6 +4,7 @@ const {
   updateCuti,
   removeCuti,
   sisaCuti,
+  lookMyCuti,
 } = require("../modules/cuti/cuti.controller");
 const {
   cutiValidator,
@@ -35,5 +36,6 @@ router.delete(
   validate,
   removeCuti,
 );
+router.get("/my-cuti", verifyToken(["user"]), lookMyCuti);
 router.get("/sisa-cuti", verifyToken(["user", "admin"]), sisaCuti);
 module.exports = router;

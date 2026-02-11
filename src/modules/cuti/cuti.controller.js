@@ -15,11 +15,6 @@ const addCuti = async (req, res) => {
   try {
     const { tgl_mulai, tgl_selesai, alasan } = req.body;
     const body = { tgl_mulai, tgl_selesai, alasan, userId: req.user.id };
-    const days = hitungHariCuti(tgl_mulai, tgl_selesai);
-    const cutiTahunan = 12;
-    if (days > cutiTahunan) {
-      return successResponse(res, 401, "Pengajuan cuti maksimal 12 hari");
-    }
     await create(body);
     return successResponse(res, 201, "Data cuti berhasil ditambahkan");
   } catch (error) {
@@ -81,9 +76,31 @@ const sisaCuti = async (req, res) => {
         message: "Jatah cuti anda tahun ini telah habis",
       });
     }
+    const sisa = cutiTahunan - totalDipakai;
+    const jatah = Math.max(0, sisa);
+    return successResponse(res, 200, "Sisa cuti", {
+      userId: req.user.id,
+      total_cuti_tahunan: 12,
+      total_cuti_dipakai: totalDipakai,
+      sisa_cuti: jatah,
+    });
   } catch (error) {
     return errorResponse(res, 500, error.message);
   }
 };
 
-module.exports = { addCuti, updateCuti, removeCuti, sisaCuti };
+const lookMyCuti = async (req, res) => {
+  try {
+    const data = await findByUserId(req.user.id);
+    if (!data) {
+      return res
+        .status(200)
+        .json({ message: "Belum ada cuti yang anda ajukan" });
+    }
+    return successResponse(res, 200, "Data cuti", data);
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
+module.exports = { addCuti, updateCuti, removeCuti, sisaCuti, lookMyCuti };

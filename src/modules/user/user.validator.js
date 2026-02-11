@@ -86,25 +86,28 @@ const updateUserValidator = [
 
   body("password")
     .trim()
-    .optional()
+    .notEmpty()
+    .withMessage("Password wajib diisi")
+    .bail()
     .isLength({ min: 6 })
     .withMessage("Password minimal 6 karakter"),
-
-  body("konfirmasi-password")
-    .trim()
-    .optional()
-    .custom((val, { req }) => {
-      if (val !== req.body.password) {
-        throw new Error("Konfirmasi password tidak sama dengan password");
-      }
-      return true;
-    }),
 
   body("role")
     .notEmpty()
     .withMessage("Role wajib diisi")
+    .bail()
     .isIn(["admin", "user", "kabagppa", "kabagumum"])
     .withMessage("Role tidak valid"),
+];
+
+const removeMeValidator = [
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password wajib diisi")
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage("Password minimal 6 karakter"),
 ];
 
 const queryValidator = [
@@ -117,9 +120,48 @@ const queryValidator = [
     .withMessage("Format query tidak valid"),
 ];
 
+const upgradeUserValidator = [
+  body("nama")
+    .trim()
+    .optional()
+    .isLength({ max: 50 })
+    .withMessage("Nama maksimal 50 karakter"),
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("Username wajib diisi")
+    .bail()
+    .isLength({ max: 50 })
+    .withMessage("Nama maksimal 50 karakter")
+    .bail()
+    .custom(async (username) => {
+      const user = await User.findOne({ where: { username } });
+      if (user != null) {
+        throw new Error("Username sudah ada, silahkan isi yang lain");
+      }
+      return true;
+    }),
+
+  body("email")
+    .trim()
+    .optional()
+    .isEmail()
+    .withMessage("Format email tidak valid")
+    .bail()
+    .custom(async (email) => {
+      const user = await User.findOne({ where: { email } });
+      if (user) {
+        throw new Error("Email sudah terdaftar");
+      }
+      return true;
+    }),
+];
+
 module.exports = {
   createValidator,
   idParamsValidator,
   updateUserValidator,
   queryValidator,
+  removeMeValidator,
+  upgradeUserValidator,
 };

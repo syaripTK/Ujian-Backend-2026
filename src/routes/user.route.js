@@ -7,12 +7,16 @@ const {
   updateUser,
   searchUser,
   searchName,
+  removeMe,
+  upgradeUser,
 } = require("../modules/user/user.controller.js");
 const {
   createValidator,
   idParamsValidator,
   updateUserValidator,
   queryValidator,
+  removeMeValidator,
+  upgradeUserValidator,
 } = require("../modules/user/user.validator.js");
 const validate = require("../shared/middlewares/errors/validate.js");
 const uploadPhoto = require("../shared/middlewares/upload.middlware.js");
@@ -38,6 +42,13 @@ router.delete(
   validate,
   removeUser,
 );
+router.post(
+  "/remove-me",
+  verifyToken(["user", "kabagppa", "kabagumum"]),
+  removeMeValidator,
+  validate,
+  removeMe,
+);
 router.patch(
   "/update/:id",
   verifyToken(["admin"]),
@@ -59,6 +70,14 @@ router.get(
   queryValidator,
   validate,
   searchName,
+);
+router.patch(
+  "/update-me",
+  verifyToken(["user", "kabagumum", "kabagppa", "admin"]),
+  uploadPhoto("profil"),
+  upgradeUserValidator,
+  validate,
+  upgradeUser,
 );
 
 module.exports = router;

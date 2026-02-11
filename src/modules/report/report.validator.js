@@ -7,8 +7,8 @@ const idParamsValidator = [
 
 const paramStatusValidator = [
   param("st")
-    .isIn(["pending", "ditolak", "dsetujui"])
-    .withMessage("Status params tidak valid"),
+    .isIn(["pending", "ditolak", "disetujui"])
+    .withMessage("Params status tidak valid"),
 ];
 
 module.exports = { idParamsValidator, paramStatusValidator };

@@ -104,8 +104,16 @@ const searchId = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    if (req.user.role == "user") {
+    const allowed = ["user", "kabagppa", "kabagumum"];
+    if (allowed.includes(req.user.role)) {
       const data = await findByUsn(req.user.username);
+      if (!data) {
+        return errorResponse(
+          res,
+          404,
+          "Maaf, profil karyawan anda belum dibuat",
+        );
+      }
       return res.status(200).json({ status: "success", data });
     }
     const karyawan = await getAll();

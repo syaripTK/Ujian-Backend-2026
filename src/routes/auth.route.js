@@ -13,10 +13,11 @@ const {
 } = require("../modules/auth/auth.validator.js");
 const validate = require("../shared/middlewares/errors/validate.js");
 const verifyToken = require("../shared/middlewares/auth.middleware.js");
+const { loginLimiter } = require("../shared/middlewares/limit.js");
 const router = express.Router();
 
 router.post("/register", registerValidator, validate, register);
-router.post("/login", loginValidator, validate, login);
+router.post("/login", loginLimiter, loginValidator, validate, login);
 router.patch(
   "/change-password",
   verifyToken(["user", "kabagppa", "kabagumum", "admin"]),

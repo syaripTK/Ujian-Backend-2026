@@ -9,13 +9,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasMany(models.Cuti, { 
-        foreignKey: 'userId',
-        as: 'cuti'
+      User.hasMany(models.Cuti, {
+        foreignKey: "userId",
+        as: "cuti",
       });
-      User.hasMany(models.Approval, { 
-        foreignKey: 'userId',
-        as: 'approval'
+      User.hasMany(models.Approval, {
+        foreignKey: "userId",
+        as: "approval",
       });
     }
   }

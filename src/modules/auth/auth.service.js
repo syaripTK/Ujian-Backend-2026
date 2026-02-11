@@ -56,6 +56,5 @@ module.exports = {
   update,
   drop,
   findAll,
-  update,
   updateKaryawan,
 };

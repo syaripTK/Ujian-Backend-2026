@@ -1,5 +1,11 @@
 const { Op } = require("sequelize");
-const { User, Cuti } = require("../../db/models/index.js");
+const {
+  User,
+  Cuti,
+  Approval,
+  Karyawan,
+  sequelize,
+} = require("../../db/models/index.js");
 
 const create = async (body) => {
   return await User.create(body);
@@ -45,11 +51,44 @@ const findUsn = async (username) => {
   });
 };
 
+const findKaryawanUsn = async (username) => {
+  return await Karyawan.findOne({
+    where: { username },
+  });
+};
+
 const findByName = async (keyword) => {
   return await User.findAll({
     where: {
       username: { [Op.like]: `%${keyword}%` },
     },
+    attributes: {
+      exclude: ["password"],
+    },
+  });
+};
+
+const dropCuti = async (userId) => {
+  return await Cuti.destroy({
+    where: { userId },
+  });
+};
+
+const dropApproval = async (userId) => {
+  return await Approval.destroy({
+    where: { userId },
+  });
+};
+
+const updateKaryawan = async (username, body) => {
+  return await Karyawan.update(body, {
+    where: { username },
+  });
+};
+
+const dropKaryawan = async (username) => {
+  return await Karyawan.destroy({
+    where: { username },
   });
 };
 
@@ -65,6 +104,31 @@ const drop = async (id) => {
   });
 };
 
+const deleteUser = async (userId) => {
+  return sequelize.transaction(async (t) => {
+    const cutiList = await Cuti.findAll({
+      where: { userId },
+      attributes: ["id"],
+      raw: true,
+      transaction: t,
+    });
+
+    const cutiId = cutiList.map((c) => c.id);
+
+    if (cutiId.length > 0) {
+      await Approval.destroy({
+        where: { cutiId: { [Op.in]: cutiId } },
+        transaction: t,
+      });
+    }
+
+    await Cuti.destroy({ where: { userId }, transaction: t });
+    await User.destroy({ where: { id: userId }, transaction: t });
+
+    return true;
+  });
+};
+
 module.exports = {
   create,
   findId,
@@ -74,4 +138,10 @@ module.exports = {
   findAll,
   search,
   findByName,
+  dropApproval,
+  dropCuti,
+  dropKaryawan,
+  deleteUser,
+  findKaryawanUsn,
+  updateKaryawan,
 };

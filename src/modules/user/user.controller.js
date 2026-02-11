@@ -10,10 +10,19 @@ const {
   findAll,
   search,
   findByName,
+  dropCuti,
+  dropApproval,
+  dropKaryawan,
+  deleteUser,
+  findKaryawanUsn,
+  updateKaryawan,
 } = require("./user.service.js");
 const path = require("path");
 const fs = require("fs");
-const { hashPassword } = require("../../shared/utils/helpers.js");
+const {
+  hashPassword,
+  comparePassword,
+} = require("../../shared/utils/helpers.js");
 
 const createUser = async (req, res) => {
   try {
@@ -58,7 +67,31 @@ const removeUser = async (req, res) => {
         fs.unlinkSync(filePath);
       }
     }
-    await drop(id);
+    await deleteUser(id);
+    return successResponse(res, 200, "Data user berhasil dihapus");
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
+const removeMe = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const user = await findId(req.user.id);
+    if (!user) {
+      return errorResponse(res, 404, "Maaf, data user tidak ditemukan");
+    }
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return errorResponse(res, 403, "Maaf, password salah");
+    }
+    if (user.profil) {
+      const filePath = path.join(__dirname, "../../uploads", user.profil);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    await deleteUser(req.user.id);
     return successResponse(res, 200, "Data user berhasil dihapus");
   } catch (error) {
     return errorResponse(res, 500, error.message);
@@ -125,6 +158,37 @@ const searchName = async (req, res) => {
   }
 };
 
+const upgradeUser = async (req, res) => {
+  try {
+    const { nama, username, email } = req.body;
+    const user = await findId(req.user.id);
+    if (!user) {
+      return successResponse(res, 404, "Maaf, user tidak ditemukan");
+    }
+    let profil = user.profil;
+    if (req.file) {
+      if (user.profil) {
+        const filePath = path.join(__dirname, "../../uploads", user.profil);
+
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+
+      profil = path.basename(req.file.path);
+    }
+    const isKaryawan = await findKaryawanUsn(req.user.username);
+    if (isKaryawan) {
+      await updateKaryawan(req.user.username, username);
+    }
+    const body = { nama, username, email, profil };
+    await update(req.user.id, body);
+    return successResponse(res, 200, "Datamu berhasil diupgrade");
+  } catch (error) {
+    return errorResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   createUser,
   seeAllUser,
@@ -132,4 +196,6 @@ module.exports = {
   updateUser,
   searchUser,
   searchName,
+  removeMe,
+  upgradeUser,
 };
